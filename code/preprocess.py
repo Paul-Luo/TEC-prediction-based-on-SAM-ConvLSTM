@@ -26,9 +26,9 @@ def process_F10_7_SSN_Dst_ap(csvpath,outpath):
     "outpath such as: ./SpaceWeatherData/processed_data/processed_OMNI2_H0_MRG1HR_95239.csv"
     "Use the following example"
     """
-    csvpath="./SpaceWeatherData/origin_data/OMNI2_H0_MRG1HR_95239.csv"
-    outpath="./SpaceWeatherData/processed_data/processed_OMNI2_H0_MRG1HR_95239.csv"
-    process_F10_7_Dst_ap(csvpath,outpath)
+    csvpath="./OMNI2_H0_MRG1HR_95239.csv"
+    outpath="./processed_OMNI2_H0_MRG1HR_95239.csv"
+    process_F10_7_SSN_Dst_ap(csvpath,outpath)
     """
 
     data = pd.read_csv(csvpath)
