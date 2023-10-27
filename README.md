@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 ## Training data preprocessing
 The total training data includes the F10.7 index, SSN index, X-ray radiation flux, ap index, Dst index and Ionosphere TEC maps. The dataset is shown as follows:    
-![Dataset](./images/dataset.png)
+![Dataset](./dataset.png)
 *<center> The total dataset </center>*  
 * The F10.7 index, SSN index, ap index, Dst index can be downloaded from https://cdaweb.gsfc.nasa.gov/.  
 * The X-ray radiation flux can be downloaded from https://data.ngdc.noaa.gov/platforms/solar-space-observing-satellites/.  
