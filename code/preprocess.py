@@ -22,8 +22,8 @@ so the following pre-processing procedures are only applicable to the data provi
 
 def process_F10_7_Dst_ap(csvpath,outpath):
     "It is used to process.csv files where F10.7, dst, and Ap reside"
-    "csvpath比如为./SpaceWeatherData/origin_data/OMNI2_H0_MRG1HR_95239.csv"
-    "outpath比如为./SpaceWeatherData/processed_data/processed_OMNI2_H0_MRG1HR_95239.csv"
+    "csvpath such as: ./SpaceWeatherData/origin_data/OMNI2_H0_MRG1HR_95239.csv"
+    "outpath such as: ./SpaceWeatherData/processed_data/processed_OMNI2_H0_MRG1HR_95239.csv"
     "Use the following example"
     """
     csvpath="./SpaceWeatherData/origin_data/OMNI2_H0_MRG1HR_95239.csv"
@@ -45,59 +45,6 @@ def process_F10_7_Dst_ap(csvpath,outpath):
     df=pd.DataFrame(data=data_origin,
                     columns=['TIME_AT_CENTER_OF_HOUR_yyyy-mm-ddThh:mm:ss.sssZ','DAILY_F10.7_','1-H_DST_nT','3-H_AP_nT'])
     df.to_csv(outpath, index=False)
-    
-
-def process_EUV(EUVpath,outpath):
-     "It is dedicated to processing EUV files, including folders from 1999 to 2022, and is finally saved as a.csv file. The following is an example"
-     """
-    # Use the following example
-    # path='D:\恢复\CELIAS_SEM_15sec_avg'
-    # outpath='D:\\恢复\\processed_EUV.csv'
-    # process_EUV(path,outpath) 
-    #下面6行是EUV数据测试代码
-    # path='D:\\恢复\\processed_EUV.csv'
-    # data=pd.read_csv(path)
-    # data=data.iloc[:,0]
-    # print("length:",len(data))
-    # data.plot()
-    # plt.show()
-     """
-     filefolderlist=get_obsFileAbPathList(EUVpath)
-     #遍历每天的EUV数据
-     EUV=[]
-     last_data=0
-     for file in filefolderlist:
-        with open(file,'r') as file_content:
-            temp=file_content.readlines()
-            #直接截取EUV数据部分，从第47行到末尾
-            EUV_content=temp[46:len(temp)]
-            #频率为15s，则一个EUV文件理论上有5760个数据，但实际并没有（一般大约5717个），因此此处进行数据扩充，need_num为需扩充的数据量（比如5760-5717=43）,将最后一个数据进行填充即可
-            total_num=len(EUV_content)
-            need_num=5760-total_num
-            for line in EUV_content:
-                line=line.split()
-                #取26-34nm波段的通量
-                EUV.append(float(line[12]))
-                last_data=float(line[12])
-            if need_num>0:
-                for k in range(need_num+2):
-                    EUV.append(last_data)
-     #原始频率为15s，现进行下采样，使其频率为1h，即每4*60=240个数据取其平均值作为最后数值
-     EUV_DownSampling=[]
-     for k in range(0,len(EUV),240):
-        temp_sum=0
-        for j in range(240):
-            if (k+j)==(len(EUV)-1):
-                temp_sum=temp_sum+EUV[k+j]
-                break
-            else:
-                temp_sum=temp_sum+EUV[k+j]
-        EUV_DownSampling.append(temp_sum/240)
-        last_data=temp_sum/240
-     df=pd.DataFrame(data=EUV_DownSampling,
-                    columns=['EUV'])
-     df.to_csv(outpath, index=False)
-
 
 
 def process_X_ray(filepath,outpath):
@@ -153,15 +100,15 @@ def process_X_ray_nc(filepath,outpath):
     # so the data file must be placed in the same directory as the.py when running
     '''
     # Use the following example
-    #示例代码
+    # Example
     path='.\\2017-2022'
-    outpath='D:\\恢复\\processed_X_ray_2017_2022.csv'
+    outpath='D:\\processed_X_ray_2017_2022.csv'
     process_X_ray_nc(path,outpath)
     '''
-    #读取所有文件名
+    #get all Xrayfilepath
     Xray_filelist=get_obsFileAbPathList(filepath)
     X_ray_nc_list=[]
-    X_ray_list_DownSampling=[]   #下采样，原nc文件频率为1min，现改为1hour
+    X_ray_list_DownSampling=[]   #downsampling，1min to 1hour
     for file in Xray_filelist:
         nc_obj=Dataset(file)
         # for i in nc_obj.variables.keys():
@@ -190,13 +137,10 @@ def process_X_ray_nc(filepath,outpath):
 
         sum_index += 1
 
-    # for k in range(0,len(X_ray_nc_list),60):
-    #     X_ray_list_DownSampling.append(X_ray_nc_list[k])
     X_ray_list_DownSampling = new_X_ray_nc_list
     df=pd.DataFrame(data=X_ray_list_DownSampling,
                     columns=['X-ray'])
     df.to_csv(outpath,index=False)
-
 
 
 def process_TEC_global_to_list(filepath):
@@ -204,17 +148,32 @@ def process_TEC_global_to_list(filepath):
     global_grid_TEC=[]
     TECfilelist=get_obsFileAbPathList(filepath)
     for TECfile in TECfilelist:
-        year=TECfile[-3:-1]   #从文件名获取年
-        doy=TECfile[-8:-4]  #从文件名获取年积日
+        year=TECfile[-3:-1]   
+        doy=TECfile[-8:-4]  
         print(TECfile)
-        if (int(year)<14) or (int(year)==14 and int(doy)<292):
+        if int(year) == 99:
             lltec = 0.1*read_ionFile(TECfile)
-            global_grid_TEC.append(lltec)
-            global_grid_TEC.append(lltec)
+            for i in range(12):
+                tmp = lltec[i]
+                global_grid_TEC.append(tmp)
+                global_grid_TEC.append(tmp)
+            # global_grid_TEC.append(lltec)
+            # global_grid_TEC.append(lltec)
+        elif (int(year)<14) or (int(year)==14 and int(doy)<292):
+            lltec = 0.1*read_ionFile(TECfile)
+            for i in range(12):
+                tmp = lltec[i]
+                global_grid_TEC.append(tmp)
+                global_grid_TEC.append(tmp)
+            # global_grid_TEC.append(lltec)
+            # global_grid_TEC.append(lltec)
         else:
             lltec = 0.1*read_ionFile_1h(TECfile)
-            global_grid_TEC.append(lltec)
-    return TECfilelist
+            for i in range(24):
+                tmp = lltec[i]
+                global_grid_TEC.append(tmp)
+    np.save('TEC_dataset.npy', global_grid_TEC)            
+    return global_grid_TEC
         
 
 def daysBetweenDates(date1, date2):
