@@ -20,8 +20,8 @@ so the following pre-processing procedures are only applicable to the data provi
 """
 
 
-def process_F10_7_Dst_ap(csvpath,outpath):
-    "It is used to process.csv files where F10.7, dst, and Ap reside"
+def process_F10_7_SSN_Dst_ap(csvpath,outpath):
+    "It is used to process.csv files where F10.7, SSN, dst, and ap reside"
     "csvpath such as: ./SpaceWeatherData/origin_data/OMNI2_H0_MRG1HR_95239.csv"
     "outpath such as: ./SpaceWeatherData/processed_data/processed_OMNI2_H0_MRG1HR_95239.csv"
     "Use the following example"
@@ -33,7 +33,7 @@ def process_F10_7_Dst_ap(csvpath,outpath):
 
     data = pd.read_csv(csvpath)
     data_origin=data.iloc[:,0:len(data)]
-    for i in range(4):
+    for i in range(5):
         for j in range(len(data_origin)):
             if data_origin.iloc[j,i]==99999:
                 data_origin.iloc[j,i]=data_origin.iloc[j-1,i]
@@ -43,7 +43,7 @@ def process_F10_7_Dst_ap(csvpath,outpath):
                 data_origin.iloc[j,i]=data_origin.iloc[j-1,i]    
 
     df=pd.DataFrame(data=data_origin,
-                    columns=['TIME_AT_CENTER_OF_HOUR_yyyy-mm-ddThh:mm:ss.sssZ','DAILY_F10.7_','1-H_DST_nT','3-H_AP_nT'])
+                    columns=['TIME_AT_CENTER_OF_HOUR_yyyy-mm-ddThh:mm:ss.sssZ','DAILY_F10.7_','SSN','1-H_DST_nT','3-H_AP_nT'])
     df.to_csv(outpath, index=False)
 
 
